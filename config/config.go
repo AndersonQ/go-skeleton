@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/caarlos0/env"
@@ -57,6 +58,10 @@ func (c Config) Logger() zerolog.Logger {
 		Str(constants.LogKeyHost, host).
 		Str(constants.LogKeyEnv, c.Env).
 		Logger()
+
+	if strings.ToUpper(c.LogOutput) == "CONSOLE" {
+		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
 
 	if !logLevelOk {
 		logger.Warn().Err(err).Msgf("%s is not a valid zerolog log level, defaulting to info", c.LogLevel)
