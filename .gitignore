@@ -1,0 +1,7 @@
+.idea/
+vendor/
+
+.\#*
+*\#*\.go
+\#*\#
+\.DS_Store
