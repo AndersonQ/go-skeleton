@@ -1,5 +1,6 @@
 package constants
 
+// LogKey are constants to be used for log field names
 const (
 	// Keep it alphabetically sorted
 	// TODO: sort it alphabetically
@@ -11,6 +12,6 @@ const (
 	LogKeyRemoteAddr       = "_remote_addr"
 	LogKeyURLPath          = "_url_path"
 	LogKeyUserAgent        = "_user_agent"
-	LogKeyResquestDuration = "_request_duration"
+	LogKeyResquestDuration = "_request_duration_ms"
 	LogKeyHTTPStatus       = "_http_status"
 )

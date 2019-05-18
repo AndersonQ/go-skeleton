@@ -39,6 +39,7 @@ func Parse() (Config, error) {
 	return confs, err
 }
 
+// Logger returns a initialised zerolog.Logger
 func (c Config) Logger() zerolog.Logger {
 	logLevelOk := true
 	logLevel, err := zerolog.ParseLevel(c.LogLevel)

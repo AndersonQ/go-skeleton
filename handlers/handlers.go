@@ -11,8 +11,11 @@ import (
 	"github.com/AndersonQ/go-skeleton/constants"
 )
 
-const ContentType = "Content-Type"
-const ContentTypeJson = "application/json; charset=utf-8"
+// Constants for http headers
+const (
+	ContentType     = "Content-Type"                    // ContentType header key
+	ContentTypeJSON = "application/json; charset=utf-8" // ContentTypeJSON content type for json requests
+)
 
 var version = "development"
 var buildTime = "build tome not set"
@@ -20,7 +23,7 @@ var buildTime = "build tome not set"
 // NewLivenessHandler a handler for kubernetes liveness probe
 func NewLivenessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(ContentType, ContentTypeJson)
+		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
 			`{"status":"Kubernetes I'm ok', no need to restart me,"version":"%s","build_time":"%s"}`,
 			version,
@@ -30,10 +33,10 @@ func NewLivenessHandler() http.HandlerFunc {
 	}
 }
 
-// NewLivenessHandler a handler for kubernetes readness probe
+// NewReadinessHandler a handler for kubernetes readness probe
 func NewReadinessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(ContentType, ContentTypeJson)
+		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
 			`{"status":"Kubernetes I'm ok', you can send requests to me,"version":"%s","build_time":"%s"}`,
 			version,
@@ -43,6 +46,8 @@ func NewReadinessHandler() http.HandlerFunc {
 	}
 }
 
+// RequestLogWrapper adds a zerolog.Loggger to the request context, set http specific log
+// fields and at the end of the request logs the request details and its duration in ms
 func RequestLogWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// TODO: Use a clock abstraction instead of time.Now()
