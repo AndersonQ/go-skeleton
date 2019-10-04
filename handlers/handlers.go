@@ -15,6 +15,8 @@ import (
 const (
 	ContentType     = "Content-Type"                    // ContentType header key
 	ContentTypeJSON = "application/json; charset=utf-8" // ContentTypeJSON content type for json requests
+
+	jsonResp = `{"status":"%s","version":"%s","build_time":"%s"}`
 )
 
 var version = "development"
@@ -25,7 +27,8 @@ func NewLivenessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
-			`{"status":"Kubernetes I'm ok', no need to restart me,"version":"%s","build_time":"%s"}`,
+			jsonResp,
+			"Kubernetes I'm ok', no need to restart me",
 			version,
 			buildTime)
 
@@ -38,7 +41,8 @@ func NewReadinessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
-			`{"status":"Kubernetes I'm ok', you can send requests to me,"version":"%s","build_time":"%s"}`,
+			jsonResp,
+			"Kubernetes I'm ok', you can send requests to me",
 			version,
 			buildTime)
 
