@@ -7,3 +7,5 @@ require (
 	github.com/rs/zerolog v1.14.3
 	github.com/stretchr/testify v1.3.0 // indirect
 )
+
+go 1.13
