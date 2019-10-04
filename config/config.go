@@ -15,7 +15,7 @@ import (
 type Config struct {
 	AppName    string `env:"APP_NAME" envDefault:"boilerplate"`
 	ServerPort int    `env:"PORT" envDefault:"8000"`
-	Env        string `env:"ENV" envDefault:"Development"`
+	Env        string `env:"ENV" envDefault:"env not set"`
 	LogLevel   string `env:"LOG_LEVEL" envDefault:"debug"`
 	LogOutput  string `env:"LOG_OUTPUT" envDefault:"console"`
 
