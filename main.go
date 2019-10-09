@@ -40,27 +40,29 @@ func main() {
 		logger.Warn().Err(err).Msg("could  init newrelic agent")
 	}
 
-	server := &http.Server{}
-
 	router := initRouter(cfg, newrelicApp, logger)
 
-	server.Handler = router
-	server.IdleTimeout = cfg.IdleTimeout
-	server.WriteTimeout = cfg.WriteTimeout
-	server.ReadHeaderTimeout = cfg.ReadHeaderTimeout
-	server.Addr = fmt.Sprintf(":%d", cfg.ServerPort)
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.ServerPort),
+		Handler: router,
+
+		IdleTimeout:       cfg.IdleTimeout,
+		WriteTimeout:      cfg.WriteTimeout,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
+	}
 
 	// handle graceful shutdown in another goroutine
-	logger.Info().Msgf("staring server on :%d", cfg.ServerPort)
 	go gracefullShutdown(signalChan, idleConnsClosed, cfg, server, newrelicApp, logger)
+
+	logger.Info().Msgf("staring server on :%d", cfg.ServerPort)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		// Error starting or closing listener:
 		logger.Err(err).Msg("HTTP server error")
 	} else {
 		logger.Info().Msg("shutting server down...")
 	}
-	<-idleConnsClosed
 
+	<-idleConnsClosed
 }
 
 func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zerolog.Logger) *chi.Mux {
