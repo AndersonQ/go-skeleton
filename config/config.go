@@ -22,11 +22,13 @@ type Config struct {
 	// NewRelicKey let it blank to disable newrelic
 	NewRelicKey string `env:"NEWRELIC_KEY" envDefault:""`
 
-	IdleTimeout  time.Duration `env:"IDLE_TIMEOUT" envDefault:"5s"`
-	WriteTimeout time.Duration `env:"WRITE_TIMEOUT" envDefault:"3s"`
-	// RequestTimeout the timeout for the incoming request
-	RequestTimeout    time.Duration `env:"REQUEST_TIMEOUT" envDefault:"5s"`
-	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"2s"`
+	IdleTimeout time.Duration `env:"IDLE_TIMEOUT" envDefault:"5s"`
+	// WriteTimeout maximum time the server will handle a request before timing out writes of the response.
+	// It must be bigger than RequestTimeout
+	WriteTimeout time.Duration `env:"WRITE_TIMEOUT" envDefault:"4s"`
+	// RequestTimeout the timeout for the incoming request set on the request handler
+	RequestTimeout    time.Duration `env:"REQUEST_TIMEOUT" envDefault:"2s"`
+	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"1s"`
 
 	// ShutdownTimeout the time the sever will wait server.Shutdown to return
 	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"6s"`
