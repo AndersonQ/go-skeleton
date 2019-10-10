@@ -78,6 +78,8 @@ func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zero
 
 	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/live", handlers.NewLivenessHandler()))
 	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/ready", handlers.NewReadinessHandler()))
+	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/slow", handlers.NewSlowHandler(
+		cfg.RequestTimeout+time.Millisecond*5)))
 
 	return router
 }
