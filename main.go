@@ -18,6 +18,7 @@ import (
 
 	"github.com/AndersonQ/go-skeleton/config"
 	"github.com/AndersonQ/go-skeleton/handlers"
+	"github.com/AndersonQ/go-skeleton/middlewares"
 )
 
 func main() {
@@ -70,14 +71,15 @@ func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zero
 	router.Use(hlog.NewHandler(logger))
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Compress(flate.BestSpeed))
-	router.Use(middleware.Timeout(cfg.RequestTimeout))
-	router.Use(handlers.RequestLogWrapper)
+	router.Use(middlewares.JsonResponse)
+
+	router.Use(middlewares.RequestLogWrapper)
+	router.Use(middlewares.TimeoutWrapper(cfg.RequestTimeout))
 
 	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/live", handlers.NewLivenessHandler()))
 	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/ready", handlers.NewReadinessHandler()))
 
 	return router
-
 }
 
 func initNewrelic(cfg config.Config, logger zerolog.Logger) (newrelic.Application, error) {
