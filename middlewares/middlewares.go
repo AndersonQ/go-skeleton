@@ -53,6 +53,6 @@ func RequestLogWrapper(next http.Handler) http.Handler {
 
 func TimeoutWrapper(timeout time.Duration) func(handler http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
-		return http.TimeoutHandler(handler, timeout, "request timed out by us")
+		return http.TimeoutHandler(handler, timeout, "")
 	}
 }
