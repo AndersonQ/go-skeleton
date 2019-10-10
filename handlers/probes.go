@@ -15,7 +15,6 @@ var buildTime = "build tome not set"
 // NewLivenessHandler a handler for kubernetes liveness probe
 func NewLivenessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
 			probeResponse,
 			"Kubernetes I'm ok', no need to restart me",
@@ -29,7 +28,6 @@ func NewLivenessHandler() http.HandlerFunc {
 // NewReadinessHandler a handler for kubernetes readness probe
 func NewReadinessHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(ContentType, ContentTypeJSON)
 		resp := fmt.Sprintf(
 			probeResponse,
 			"Kubernetes I'm ok', you can send requests to me",

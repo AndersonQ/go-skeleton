@@ -11,13 +11,9 @@ import (
 )
 
 // JsonResponse sets the response content-type header to application/json; charset=utf-8
-// it will overwrite the content-type set by any inner middleware
 func JsonResponse(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// overwrite the content-type set by any inner middleware
-		defer func() {
-			w.Header().Set(handlers.ContentType, handlers.ContentTypeJSON)
-		}()
+		w.Header().Set(handlers.ContentType, handlers.ContentTypeJSON)
 
 		next.ServeHTTP(w, r)
 	})
@@ -53,6 +49,6 @@ func RequestLogWrapper(next http.Handler) http.Handler {
 
 func TimeoutWrapper(timeout time.Duration) func(handler http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
-		return http.TimeoutHandler(handler, timeout, "")
+		return http.TimeoutHandler(handler, timeout, `{"error":"timeout"}`)
 	}
 }
