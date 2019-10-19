@@ -28,7 +28,7 @@ git clone https://github.com/AndersonQ/go-skeleton.git
 or using 
 
 ```bash
-go get -u github.com/AndersonQ/go-skeleton.git
+go get -u github.com/AndersonQ/go-skeleton
 ```
 
 and start from there!
