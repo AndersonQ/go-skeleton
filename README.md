@@ -1,11 +1,11 @@
-go-skeleton
------------
-A skeleton for go microservices
 
+# GO Skeleton
+
+> A skeleton for go microservices
 
 ## Motivation
-Besides avoiding to copy it from the last microservice I've written, a friend asked how I'd do it.
-That's is how I'm doing it right now
+> Besides avoiding to copy it from the last microservice I've written, a friend asked how I'd do it.
+> That's is how I'm doing it right now
 
 
 ## Dependencies
@@ -16,24 +16,24 @@ make deps
 
 ## Run
 
-### Local
+-- Local
 ```bash
 go run main.go
 ```
 
-#### Docker
+-- Docker
 ```bash
 docker run --rm -e ENV=dev -p8000:8000 go-skeleton
 ```
 
 ## Build
 
-### Local
+-- Local
 ```bash
 make build
 ```
 
-### Docker
+-- Docker
 
 ```bash
 docker build -t go-skeleton .
@@ -46,5 +46,4 @@ make test
 ```
  
 ## Licence
-See [LICENCE](LICENSE)
- 
+> See [LICENCE](LICENSE)
