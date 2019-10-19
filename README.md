@@ -35,11 +35,15 @@ and start from there!
 
 ## Dependencies
 
+To make sure that your dependencies are up to date, you can run:
+
 ```bash
 make deps
 ```
 
 ## Run
+
+To run the skeleton you can use the following commands. 
 
 ### Local
 ```bash
@@ -47,6 +51,11 @@ go run main.go
 ```
 
 #### Docker
+
+Bevore you can run the project in docker, you'll have to install that, if it's not already present in your environment.
+
+For further information and help around docker visit: https://docs.docker.com/get-started/
+
 ```bash
 docker run --rm -e ENV=dev -p8000:8000 go-skeleton
 ```
@@ -60,11 +69,17 @@ make build
 
 ### Docker
 
+Bevore you can run the project in docker, you'll have to install that, if it's not already present in your environment.
+
+For further information and help around docker visit: https://docs.docker.com/get-started/
+
 ```bash
 docker build -t go-skeleton .
 ```
 
 ## Test
+
+To run a test use the following command:
 
 ```bash
 make test
