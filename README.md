@@ -54,8 +54,7 @@ go run main.go
 
 Bevore you can run the project in docker, you'll have to install that, if it's not already present in your environment.
 
-For further information and help around docker visit: https://docs.docker.com/get-started/
-
+For further information and help around docker visit: [getting started with docker](https://docs.docker.com/get-started/)
 ```bash
 docker run --rm -e ENV=dev -p8000:8000 go-skeleton
 ```
@@ -71,7 +70,7 @@ make build
 
 Bevore you can run the project in docker, you'll have to install that, if it's not already present in your environment.
 
-For further information and help around docker visit: https://docs.docker.com/get-started/
+For further information and help around docker visit: [getting started with docker](https://docs.docker.com/get-started/)
 
 ```bash
 docker build -t go-skeleton .
