@@ -68,7 +68,7 @@ func main() {
 
 func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zerolog.Logger) *chi.Mux {
 	router := chi.NewRouter()
-	// TODO(Anderson): create a tracking ID middleware
+	router.Use(middlewares.RequestIDHandler)
 	router.Use(hlog.NewHandler(logger))
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Compress(flate.BestSpeed))
