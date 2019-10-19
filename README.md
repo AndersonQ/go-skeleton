@@ -63,7 +63,7 @@ docker build -t go-skeleton .
 
 ## Test
 
-To run a test use the following command:
+To run the tests use the following command:
 
 ```bash
 make test
