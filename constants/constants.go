@@ -13,5 +13,6 @@ const (
 	LogKeyURLPath          = "_url_path"
 	LogKeyUserAgent        = "_user_agent"
 	LogKeyResquestDuration = "_request_duration_ms"
+	LogKeyResquestID       = "_request_id"
 	LogKeyHTTPStatus       = "_http_status"
 )
