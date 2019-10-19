@@ -12,25 +12,10 @@ That's is how I'm doing it right now
 
 ## Download
 
-Clone the repository using 
-
-### SSH
-
+Clone the repository or use 
 ```bash
-git clone git@github.com:AndersonQ/go-skeleton.git
-```
-
-### https
-
-```bash
-git clone https://github.com/AndersonQ/go-skeleton.git
-```
-or using 
-
-```bash
-go get -u github.com/AndersonQ/go-skeleton
-```
-
+go get -u github.com/AndersonQ/go-skeleton.git
+``` 
 and start from there!
 
 ## Dependencies
@@ -78,7 +63,7 @@ docker build -t go-skeleton .
 
 ## Test
 
-To run the tests use the following command:
+To run a test use the following command:
 
 ```bash
 make test
