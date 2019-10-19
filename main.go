@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ascarter/requestid"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	newrelic "github.com/newrelic/go-agent"
@@ -69,7 +68,7 @@ func main() {
 
 func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zerolog.Logger) *chi.Mux {
 	router := chi.NewRouter()
-	router.Use(requestid.RequestIDHandler)
+	router.Use(middlewares.RequestIDHandler)
 	router.Use(hlog.NewHandler(logger))
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Compress(flate.BestSpeed))

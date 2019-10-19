@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ascarter/requestid"
 	"github.com/rs/zerolog"
 
 	"github.com/AndersonQ/go-skeleton/constants"
@@ -26,13 +25,12 @@ func RequestLogWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// TODO: Use a clock abstraction instead of time.Now()
 		startTime := time.Now()
-		reqID, _ := requestid.FromContext(r.Context())
 		logger := zerolog.Ctx(r.Context()).With().
 			Str(constants.LogKeyHTTPMethod, r.Method).
 			Str(constants.LogKeyURLPath, r.URL.Path).
 			Str(constants.LogKeyUserAgent, r.UserAgent()).
 			Str(constants.LogKeyRemoteAddr, r.RemoteAddr).
-			Str(constants.LogKeyResquestID, reqID).
+			Str(constants.LogKeyResquestID, requestIDFromContext(r.Context())).
 			Logger()
 
 		ww := statusResponseWriter{w: w}
