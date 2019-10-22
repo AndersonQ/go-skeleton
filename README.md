@@ -14,7 +14,7 @@ That's is how I'm doing it right now
 
 Clone the repository or use 
 ```bash
-go get -u github.com/AndersonQ/go-skeleton.git
+go get -u github.com/AndersonQ/go-skeleton
 ``` 
 and start from there!
 
