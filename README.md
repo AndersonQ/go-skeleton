@@ -44,6 +44,11 @@ docker build -t go-skeleton .
 ```bash
 make test
 ```
- 
+
+## Contributors
+
+- Anderson Queiroz - [AndersonQ](https://github.com/AndersonQ)
+- Mstislav Bobakov - [mbobakov](https://github.com/mbobakov)
+
 ## Licence
 > See [LICENCE](LICENSE)
