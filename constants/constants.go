@@ -13,5 +13,7 @@ const (
 	LogKeyResquestID       = "_request_id"
 	LogKeyTimestamp        = "_timestamp"
 	LogKeyURLPath          = "_url_path"
-	LogKeyUserAgent        = "_user_agent"	
+	LogKeyUserAgent        = "_user_agent"
+
+	HeaderKeyRequestID = "X-Request-ID"
 )

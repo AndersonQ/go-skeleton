@@ -4,21 +4,23 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/AndersonQ/go-skeleton/constants"
+
 	"github.com/google/uuid"
 )
 
 type reqIDCtx int
 
-const reqIDContexKey reqIDCtx = reqIDCtx(0)
+const reaIDContextKey = reqIDCtx(0)
 
 // requestIDContext creates a context with request id
 func requestIDContext(ctx context.Context, rid string) context.Context {
-	return context.WithValue(ctx, reqIDContexKey, rid)
+	return context.WithValue(ctx, reaIDContextKey, rid)
 }
 
 // requestIDFromContext returns the request id from context
 func requestIDFromContext(ctx context.Context) string {
-	rid, ok := ctx.Value(reqIDContexKey).(string)
+	rid, ok := ctx.Value(reaIDContextKey).(string)
 	if !ok {
 		return ""
 	}
@@ -30,11 +32,14 @@ func requestIDFromContext(ctx context.Context) string {
 // request id. Otherwise, generates a new unique ID.
 func RequestIDHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rid := r.Header.Get("X-Request-ID")
+		rid := r.Header.Get(constants.HeaderKeyRequestID)
+
 		if rid == "" {
 			rid = uuid.New().String()
-			r.Header.Set("X-Request-ID", rid)
 		}
+
+		w.Header().Set(constants.HeaderKeyRequestID, rid)
+
 		ctx := requestIDContext(r.Context(), rid)
 		h.ServeHTTP(w, r.WithContext(ctx))
 	})
