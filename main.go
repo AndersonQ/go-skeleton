@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -24,8 +23,7 @@ import (
 func main() {
 	// catch the signals as soon as possible
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT)  // a.k.a ctrl+C
-	signal.Notify(signalChan, syscall.SIGTERM) // a.k.a kill
+	signal.Notify(signalChan, os.Interrupt) // a.k.a ctrl+C
 
 	// when closed the program should exit
 	idleConnsClosed := make(chan bool)
