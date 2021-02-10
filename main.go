@@ -4,20 +4,24 @@ import (
 	"compress/flate"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	bllogger "github.com/blacklane/go-libs/logger"
+	blmiddleware "github.com/blacklane/go-libs/logger/middleware"
+	bltrackingmiddleware "github.com/blacklane/go-libs/tracking/middleware"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	newrelic "github.com/newrelic/go-agent"
+	"github.com/opentracing/opentracing-go"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/hlog"
 
 	"github.com/AndersonQ/go-skeleton/config"
 	"github.com/AndersonQ/go-skeleton/handlers"
 	"github.com/AndersonQ/go-skeleton/middlewares"
+	"github.com/AndersonQ/go-skeleton/tracing"
 )
 
 func main() {
@@ -34,12 +38,10 @@ func main() {
 	}
 
 	logger := cfg.Logger()
-	newrelicApp, err := initNewrelic(cfg, logger)
-	if err != nil {
-		logger.Warn().Err(err).Msg("could  init newrelic agent")
-	}
 
-	router := initRouter(cfg, newrelicApp, logger)
+	tracer, tracerCloser := tracing.NewJaegerTracer(cfg, logger)
+
+	router := initRouter(cfg, logger, tracer)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.ServerPort),
@@ -51,7 +53,7 @@ func main() {
 	}
 
 	// handle graceful shutdown in another goroutine
-	go gracefullShutdown(signalChan, idleConnsClosed, cfg, server, newrelicApp, logger)
+	go gracefulShutdown(signalChan, idleConnsClosed, cfg, server, logger, tracerCloser)
 
 	logger.Info().Msgf("staring server on :%d", cfg.ServerPort)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
@@ -64,45 +66,33 @@ func main() {
 	<-idleConnsClosed
 }
 
-func initRouter(cfg config.Config, newrelicApp newrelic.Application, logger zerolog.Logger) *chi.Mux {
+func initRouter(cfg config.Config, logger bllogger.Logger, tracer opentracing.Tracer) *chi.Mux {
 	router := chi.NewRouter()
-	router.Use(middlewares.RequestIDHandler)
-	router.Use(hlog.NewHandler(logger))
+	router.Use(bltrackingmiddleware.TrackingID)
+	router.Use(blmiddleware.HTTPAddLogger(logger))
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Compress(flate.BestSpeed))
 	router.Use(middlewares.JsonResponse)
-	router.Use(middlewares.RequestLogWrapper)
+	router.Use(blmiddleware.HTTPRequestLogger([]string{}))
 	router.Use(middlewares.TimeoutWrapper(cfg.RequestTimeout))
 
-	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/live", handlers.NewLivenessHandler()))
-	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/ready", handlers.NewReadinessHandler()))
-	router.Get(newrelic.WrapHandleFunc(newrelicApp, "/slow", handlers.NewSlowHandler(
+	router.Get(middlewares.AddOpentracing("/live", tracer, handlers.NewLivenessHandler()))
+	router.Get(middlewares.AddOpentracing("/ready", tracer, handlers.NewReadinessHandler()))
+	router.Get(middlewares.AddOpentracing("/slow", tracer, handlers.NewSlowHandler(
 		cfg.RequestTimeout+time.Millisecond*5)))
+
+	router.Get(middlewares.AddOpentracing("/trace", tracer, handlers.NewOpentracing()))
 
 	return router
 }
 
-func initNewrelic(cfg config.Config, logger zerolog.Logger) (newrelic.Application, error) {
-	ncfg := newrelic.NewConfig(cfg.AppName, cfg.NewRelicKey)
-
-	// Disable communication with newrelic, see https://github.com/newrelic/go-agent/blob/master/config.go#L27
-	if len(cfg.NewRelicKey) == 0 {
-		ncfg.Enabled = false
-		logger.Warn().Msg("Disabling NewRelic as license key is empty")
-	}
-
-	app, err := newrelic.NewApplication(ncfg)
-
-	return app, err
-}
-
-func gracefullShutdown(
+func gracefulShutdown(
 	signalChan chan os.Signal,
 	idleConnsClosed chan bool,
 	cfg config.Config,
 	server *http.Server,
-	newrelicApp newrelic.Application,
-	logger zerolog.Logger) {
+	logger zerolog.Logger,
+	tracer io.Closer) {
 
 	sig := <-signalChan
 	logger.Info().Msgf("received signal: %q, starting graceful shutdown...", sig.String())
@@ -111,16 +101,11 @@ func gracefullShutdown(
 	defer done() // avoid a context leak
 
 	if err := server.Shutdown(ctx); err != nil {
-		logger.Error().Err(err).Msg("error during gracefully shutdown")
+		logger.Error().Err(err).Msg("error during server shutdown")
 	}
 
-	deadline, _ := ctx.Deadline()
-
-	if newrelicApp != nil {
-		logger.Info().Msg("shunting down Newrelic")
-		newrelicApp.Shutdown(deadline.Sub(time.Now()))
-	} else {
-		logger.Info().Msg("newrelic not initialised, nothing to shutdown")
+	if err := tracer.Close(); err != nil {
+		logger.Error().Err(err).Msg("error during tracer shutdown")
 	}
 
 	logger.Info().Msg("Gracefully shutdown finished")

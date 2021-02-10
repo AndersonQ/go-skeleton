@@ -28,3 +28,6 @@ test: deps
 check:
 	$(GO) vet $$($(GO) list ./...)
 	$(GOLINT) $$($(GO) list ./...)
+
+clean:
+	$(GO) clean
