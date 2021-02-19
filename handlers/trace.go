@@ -3,13 +3,16 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math/rand"
 	"net/http"
 
 	"github.com/blacklane/go-libs/logger"
 	"github.com/blacklane/go-libs/tracking"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
 
 	"github.com/AndersonQ/go-skeleton/tracing"
@@ -27,19 +30,27 @@ func NewOpentracing() http.Handler {
 			log.Event("some_event"),
 			log.Message("some message"))
 
+		if rand.Int()%2 == 0 {
+			sp.LogFields(log.Error(errors.New("bad coin flip")))
+			ext.Error.Set(sp, true)
+			w.WriteHeader(http.StatusTeapot)
+			_, _ = w.Write([]byte(`I'm a tea pot`))
+			return
+		}
+
 		url := r.URL.Query().Get("url")
 		if url != "" {
 			if err := externalCall(ctx, url); err != nil {
 				logger.FromContext(ctx).Err(err).Msg("external call failed")
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(fmt.Sprintf(`{"error":%q,"tracking_id":"%s"}`,
+				_, _ = w.Write([]byte(fmt.Sprintf(`{"error":%q,"tracking_id":"%s"}`,
 					err, tracking.IDFromContext(ctx))))
 				return
 			}
 		}
 
 		headers, _ := json.Marshal(w.Header())
-		w.Write([]byte(
+		_, _ = w.Write([]byte(
 			fmt.Sprintf(`{"tracking_id":"%s","url":"%s","headers":%q}`,
 				tracking.IDFromContext(ctx),
 				url,
@@ -53,6 +64,7 @@ func externalCall(ctx context.Context, url string) error {
 		logger.FromContext(ctx).Err(err).Msgf("create request to %q", url)
 	}
 
+	req.Header.Set("X-Tracking-Id", tracking.IDFromContext(ctx))
 	sp := tracing.SpanFromContext(ctx)
 	err = sp.Tracer().Inject(
 		sp.Context(),
