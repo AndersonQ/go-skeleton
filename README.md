@@ -44,6 +44,15 @@ query {
 
  6. have fun :)
 
+## More on:
+### Go
+- https://github.com/opentracing/opentracing-go
+- https://github.com/jaegertracing/jaeger-client-go will be replaced by Datadog Go tracer
+
+### JS/TS/NodeJS:
+- https://github.com/opentracing/opentracing-javascript
+- https://github.com/jaegertracing/jaeger-client-node will be replaced by Datadog JS/TS tracer
+
 ## Dependencies
 
 ```bash
